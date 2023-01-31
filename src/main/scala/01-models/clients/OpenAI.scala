@@ -1,12 +1,13 @@
 package models.clients
 
 import models.common.JsonHelper
+import models.common.ZIOClient._
 
 import org.joda.time.Instant
 import zio.json.{ JsonCodec, jsonField }
 
 object OpenAI:
-  sealed trait Models extends Product with Serializable
+
   final case class Choice(
     text: String,
     index: Int,
@@ -27,17 +28,11 @@ object OpenAI:
     index: Int
   ) extends Models
 
-  sealed trait Params      extends Product with Serializable
-  sealed trait BodyParams  extends Params
-  sealed trait PathParams  extends Params
-  sealed trait QueryParams extends Params
-
   final case class RetrieveModelPathParams(model: String) extends PathParams
   final case class CreateCompletionBodyParams(
     model: String,
     prompt: String = "<|endoftext|>",
-    suffix: String,
-    maxTokens: Int = 16,
+    max_tokens: Int = 40,
     temperature: Double = 0.3,
     n: Int = 1
   ) extends BodyParams
@@ -45,7 +40,7 @@ object OpenAI:
     model: String,
     input: String,
     instruction: String,
-    maxTokens: Int = 16,
+    max_tokens: Int = 40,
     temperature: Double = 0.3,
     n: Int = 1
   ) extends BodyParams
@@ -60,12 +55,6 @@ object OpenAI:
     input: String
   ) extends BodyParams
 
-  sealed trait Requests                                            extends Product with Serializable
-  sealed trait BodyRequest(body: BodyParams)                       extends Requests
-  sealed trait PathRequest(path: PathParams)                       extends Requests
-  sealed trait QueryRequest(query: QueryParams)                    extends Requests
-  sealed trait PathBodyRequest(path: PathParams, body: BodyParams) extends Requests
-
   final case class ListModelsRequest()                                       extends Requests
   final case class RetrieveModelRequest(path: RetrieveModelPathParams)       extends PathRequest(path)
   final case class CreateCompletionRequest(body: CreateCompletionBodyParams) extends BodyRequest(body)
@@ -73,8 +62,7 @@ object OpenAI:
   final case class CreateImageRequest(body: CreateImageBodyParams)           extends BodyRequest(body)
   final case class CreateEmbeddingsRequest(body: CreateEmbeddingsBodyParams) extends BodyRequest(body)
 
-  sealed trait Responses                                                   extends Product with Serializable
-  final case class ListModelsResponse(models: List[RetrieveModelResponse]) extends Responses
+  final case class ListModelsResponse(data: List[RetrieveModelResponse]) extends Responses
   final case class RetrieveModelResponse(
     id: String,
     @jsonField("object") object_type: String,
@@ -83,7 +71,6 @@ object OpenAI:
   final case class CreateCompletionResponse(
     id: String,
     @jsonField("object") object_type: String,
-    created: Instant,
     model: String,
     choices: List[Choice],
     usage: Usage
@@ -106,10 +93,10 @@ object OpenAI:
   object Json:
     import JsonHelper._
     import JsonHelper.given
-    
-    given JsonCodec[Choice] = deriveCodec
-    given JsonCodec[Usage]  = deriveCodec
-    given JsonCodec[URL]    = deriveCodec
+
+    given JsonCodec[Choice]    = deriveCodec
+    given JsonCodec[Usage]     = deriveCodec
+    given JsonCodec[URL]       = deriveCodec
     given JsonCodec[Embedding] = deriveCodec
 
     given JsonCodec[RetrieveModelPathParams]    = deriveCodec
@@ -124,11 +111,10 @@ object OpenAI:
     given JsonCodec[CreateEditRequest]       = deriveCodec
     given JsonCodec[CreateImageRequest]      = deriveCodec
     given JsonCodec[CreateEmbeddingsRequest] = deriveCodec
-    
+
     given JsonCodec[ListModelsResponse]       = deriveCodec
     given JsonCodec[RetrieveModelResponse]    = deriveCodec
     given JsonCodec[CreateCompletionResponse] = deriveCodec
     given JsonCodec[CreateEditResponse]       = deriveCodec
     given JsonCodec[CreateImageResponse]      = deriveCodec
     given JsonCodec[CreateEmbeddingsResponse] = deriveCodec
-    

@@ -20,5 +20,5 @@ object OpenAIService:
   final case class CreateImageWithAdaDTO(prompt: String)      extends Request
 
   sealed trait Response
-  final case class CreateCompletionWithAdaResponse(completion: List[String]) extends Response
-  final case class CreateImageWithAdaResponse(urls: List[String])            extends Response
+  final case class CreateCompletionWithAdaResponse(completions: List[String]) extends Response
+  final case class CreateImageWithAdaResponse(urls: List[String])             extends Response

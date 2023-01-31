@@ -1,6 +1,7 @@
 package models.common
 
-import zhttp.http.{ Path, Response, Status }
+import zio.http.model.Status
+import zio.http.{ Path, Response }
 
 import java.util.UUID
 
@@ -11,7 +12,7 @@ object ServerError:
 
   final case class InternalServerError(error: InternalServerErrorMessage) extends ServerError
 
-  final case class NotFoundError(path: Path) extends ServerError
+  final case class NotFoundError(str: String) extends ServerError
 
   final case class ServiceError(error: ServiceErrorMessage) extends ServerError
 

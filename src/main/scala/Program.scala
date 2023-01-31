@@ -1,8 +1,15 @@
+import clients.implementation.OpenAIClientLive
 import config.Config
-import zio._
+import services.OpenAIService
+import services.implementation.OpenAIServiceLive
+import gateway.Gateway
+import gateway.implementation.ConsoleGateway
+import zio.*
 import zio.logging.slf4j.bridge.Slf4jBridge
 
 object Program:
+  private type Services = OpenAIService
+
   private lazy val openAIConfiguration: TaskLayer[Config.OpenAIConfig] =
     ZLayer.scoped {
       for {
@@ -23,12 +30,27 @@ object Program:
       } yield serverConfig
     }
 
+  private lazy val configuration = openAIConfiguration ++ serverConfiguration
+
+  private lazy val services: TaskLayer[Services] =
+    ZLayer.make[OpenAIService](
+      OpenAIServiceLive.layer,
+      OpenAIClientLive.layer,
+      openAIConfiguration
+    )
+
+  private lazy val gatewayLayer: TaskLayer[ConsoleGateway.GatewayOut] =
+    ZLayer.make[ConsoleGateway.GatewayOut](ConsoleGateway.layer, services)
+
   private lazy val logger: ULayer[Unit] =
     Slf4jBridge.initialize
 
-  private lazy val Layers = openAIConfiguration ++ logger
+  private lazy val AppLayers = gatewayLayer ++ logger ++ services ++ configuration
 
   lazy val make: ZIO[ZIOAppArgs with Scope, Any, Unit] = {
-    for _ <- ZIO.succeed(())
-    yield ()
-  }.provide(Layers)
+    for {
+      _       <- ZIO.log("Starting app")
+      gateway <- ZIO.serviceWith[ConsoleGateway.GatewayOut](_.start)
+      _       <- gateway.raceAwait(ZIO.never)
+    } yield ()
+  }.provide(AppLayers)

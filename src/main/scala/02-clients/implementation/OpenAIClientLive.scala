@@ -4,19 +4,18 @@ import config.Config.OpenAIConfig
 import clients.OpenAIClient
 import models.common.ServerError
 import models.clients.OpenAI
-
 import models.common.ServerError
 import zio.{ IO, RLayer, ZLayer }
 import zio.json.{ JsonDecoder, JsonEncoder }
-import zhttp.http.{ Headers, MediaType, Method }
+import zio.http.model.{ Header, Headers, MediaType, Method }
 
 final case class OpenAIClientLive(config: OpenAIConfig)
     extends OpenAIClient
-    with ZIOClient(
+    with HttpClient(
       config.root,
       Headers
-        .bearerAuthorizationHeader(config.apiKey)
-        .addHeaders(Headers.contentType("application/json"))
+        .contentType("application/json")
+        .withAuthorization(s"Bearer ${config.apiKey}")
     ):
   import OpenAI.Json.given
 
@@ -57,9 +56,9 @@ final case class OpenAIClientLive(config: OpenAIConfig)
   override def createCompletion(
     createCompletionRequest: OpenAI.CreateCompletionRequest
   ): IO[ServerError, OpenAI.CreateCompletionResponse] =
-    performAndPerformRequest[OpenAI.CreateCompletionRequest, OpenAI.CreateCompletionResponse, ServerError](
+    performAndPerformRequest[OpenAI.CreateCompletionBodyParams, OpenAI.CreateCompletionResponse, ServerError](
       endpoint = "/v1/completions",
-      request = createCompletionRequest,
+      request = createCompletionRequest.body,
       method = Method.POST,
       sendContent = true
     )
@@ -67,9 +66,9 @@ final case class OpenAIClientLive(config: OpenAIConfig)
   override def createEdit(
     createEditRequest: OpenAI.CreateEditRequest
   ): IO[ServerError, OpenAI.CreateEditResponse] =
-    performAndPerformRequest[OpenAI.CreateEditRequest, OpenAI.CreateEditResponse, ServerError](
+    performAndPerformRequest[OpenAI.CreateEditBodyParams, OpenAI.CreateEditResponse, ServerError](
       endpoint = "/v1/edits",
-      request = createEditRequest,
+      request = createEditRequest.body,
       method = Method.POST,
       sendContent = true
     )
@@ -77,9 +76,9 @@ final case class OpenAIClientLive(config: OpenAIConfig)
   override def createEmbeddings(
     createEmbeddingsRequest: OpenAI.CreateEmbeddingsRequest
   ): IO[ServerError, OpenAI.CreateEmbeddingsResponse] =
-    performAndPerformRequest[OpenAI.CreateEmbeddingsRequest, OpenAI.CreateEmbeddingsResponse, ServerError](
+    performAndPerformRequest[OpenAI.CreateEmbeddingsBodyParams, OpenAI.CreateEmbeddingsResponse, ServerError](
       endpoint = "/v1/embeddings",
-      request = createEmbeddingsRequest,
+      request = createEmbeddingsRequest.body,
       method = Method.POST,
       sendContent = true
     )
@@ -87,9 +86,9 @@ final case class OpenAIClientLive(config: OpenAIConfig)
   override def createImage(
     createImageRequest: OpenAI.CreateImageRequest
   ): IO[ServerError, OpenAI.CreateImageResponse] =
-    performAndPerformRequest[OpenAI.CreateImageRequest, OpenAI.CreateImageResponse, ServerError](
+    performAndPerformRequest[OpenAI.CreateImageBodyParams, OpenAI.CreateImageResponse, ServerError](
       endpoint = "/v1/images/generations",
-      request = createImageRequest,
+      request = createImageRequest.body,
       method = Method.POST,
       sendContent = true
     )

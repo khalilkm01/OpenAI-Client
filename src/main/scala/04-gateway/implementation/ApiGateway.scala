@@ -5,11 +5,10 @@ import models.common.ServerError
 import services.OpenAIService
 import gateway.Gateway
 import zio.{ RIO, URIO, ZIO, ZLayer }
-import zio._
+import zio.*
+import zio.http.model.HttpError
 import zio.json.JsonEncoder
-import zhttp.http.Method.{ GET, POST }
-import zhttp.http.{ Http, HttpError, RHttpApp, Response }
-import zhttp.service.Server
+import zio.http.{ Http, RHttpApp, Response, Server }
 
 final case class ApiGateway(openAIService: OpenAIService)
     extends Gateway[OpenAIService, Config.OpenAIConfig with Config.ServerConfig]:
@@ -20,15 +19,14 @@ final case class ApiGateway(openAIService: OpenAIService)
 
   override val startingMessage: String = ???
 
-  override def start: RIO[Environment, Unit] =
-    for {
-      serverConfig <- ZIO.service[Config.ServerConfig]
-      _ <- ZIO.log(message = startingMessage) *> Server
-        .start(
-          serverConfig.port,
-          apiRoute.withAccessControlAllowOrigin("*") <> Http.notFound
-        )
-    } yield ()
+  override def start: RIO[Environment, Unit] = ???
+//    for {
+//      serverConfig <- ZIO.service[Config.ServerConfig]
+//      _ <- ZIO.log(message = startingMessage) *> Server
+//        .serve(
+//          apiRoute
+//        )
+//    } yield ()
 
   private def httpResponseHandler[R, A](
     rio: RIO[R, A],
@@ -47,5 +45,6 @@ final case class ApiGateway(openAIService: OpenAIService)
     )
 
 object ApiGateway:
-  lazy val layer: URLayer[OpenAIService, Gateway[OpenAIService, Config.OpenAIConfig with Config.ServerConfig]] =
+  type GatewayOut = Gateway[OpenAIService, Config.OpenAIConfig with Config.ServerConfig]
+  lazy val layer: URLayer[OpenAIService, GatewayOut] =
     ZLayer.fromFunction(ApiGateway(_))

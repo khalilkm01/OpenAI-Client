@@ -13,9 +13,9 @@ final case class OpenAIServiceLive(client: OpenAIClient) extends OpenAIService w
     createCompletionWithAdaDTO: OpenAIService.CreateCompletionWithAdaDTO
   ): IO[ServerError, OpenAIService.CreateCompletionWithAdaResponse] =
     for {
-      models <- client.listModels
+      models <- ZIO.log("OPENAISERVICE: Retrieving Models") *> client.listModels
       ada <- ZIO
-        .fromOption(models.models.find(_.id.contains("ada")))
+        .fromOption(models.data.find(_.id.contains("ada")))
         .mapError(_ ⇒
           ServerError.InternalServerError(
             ServerError.InternalServerErrorMessage.UnknownError(
@@ -26,8 +26,7 @@ final case class OpenAIServiceLive(client: OpenAIClient) extends OpenAIService w
       requestBody <- ZIO.succeed(
         OpenAI.CreateCompletionBodyParams(
           model = ada.id,
-          prompt = createCompletionWithAdaDTO.prompt,
-          suffix = ""
+          prompt = createCompletionWithAdaDTO.prompt
         )
       )
       request <- ZIO.succeed(
@@ -35,8 +34,9 @@ final case class OpenAIServiceLive(client: OpenAIClient) extends OpenAIService w
           requestBody
         )
       )
-      response <- client.createCompletion(request)
+      response <- ZIO.log("OPENAISERVICE: Requesting Completion") *> client.createCompletion(request)
       choices = response.choices
+      _ <- ZIO.log("OPENAISERVICE: Response Received")
     } yield OpenAIService.CreateCompletionWithAdaResponse(choices.map(_.text))
 
   override def createImageWithAda(

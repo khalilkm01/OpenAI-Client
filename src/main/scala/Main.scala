@@ -1,4 +1,4 @@
-import zio.*
+import zio.{ Scope, ZIO, ZIOAppArgs, ZIOAppDefault, ZLayer }
 
 object Main extends ZIOAppDefault:
 
