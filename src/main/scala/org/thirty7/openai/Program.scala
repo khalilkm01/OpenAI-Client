@@ -1,9 +1,12 @@
-import clients.implementation.OpenAIClientLive
+package org.thirty7.openai
+
 import config.Config
+import clients.implementation.OpenAIClientLive
 import services.OpenAIService
 import services.implementation.OpenAIServiceLive
 import gateway.Gateway
 import gateway.implementation.ConsoleGateway
+
 import zio.*
 import zio.logging.slf4j.bridge.Slf4jBridge
 

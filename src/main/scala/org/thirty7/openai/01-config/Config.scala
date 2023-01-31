@@ -1,3 +1,4 @@
+package org.thirty7.openai
 package config
 
 import zio.{ Layer, TaskLayer }

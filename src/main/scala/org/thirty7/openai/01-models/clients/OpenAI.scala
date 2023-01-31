@@ -1,3 +1,4 @@
+package org.thirty7.openai
 package models.clients
 
 import models.common.JsonHelper

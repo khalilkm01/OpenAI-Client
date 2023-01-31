@@ -1,3 +1,4 @@
+package org.thirty7.openai
 package clients.implementation
 
 import config.Config.OpenAIConfig

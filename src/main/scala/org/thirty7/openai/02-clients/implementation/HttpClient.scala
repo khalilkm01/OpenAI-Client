@@ -1,3 +1,4 @@
+package org.thirty7.openai
 package clients.implementation
 
 import models.common.{ ServerError, ZIOResponse }
@@ -11,7 +12,6 @@ trait HttpClient(root: String, headers: Headers):
   import HttpClient.ClientLayer
 
   private val api: String = root
-  
 
   def performRequest[Req, Res, E >: ServerError](
     endpoint: String,

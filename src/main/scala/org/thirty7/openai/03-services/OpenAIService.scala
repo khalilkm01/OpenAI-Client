@@ -1,3 +1,4 @@
+package org.thirty7.openai
 package services
 
 import models.common.ServerError

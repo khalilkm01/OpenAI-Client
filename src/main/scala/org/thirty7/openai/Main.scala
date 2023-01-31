@@ -1,4 +1,6 @@
-import zio.{ Scope, ZIO, ZIOAppArgs, ZIOAppDefault, ZLayer }
+package org.thirty7.openai
+
+import zio.*
 
 object Main extends ZIOAppDefault:
 
