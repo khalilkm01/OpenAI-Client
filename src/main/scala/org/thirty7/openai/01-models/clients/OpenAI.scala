@@ -29,7 +29,9 @@ object OpenAI:
     index: Int
   ) extends Models
 
-  final case class RetrieveModelPathParams(model: String) extends PathParams
+  final case class RetrieveModelPathParams(
+    model: String
+  ) extends PathParams
   final case class CreateCompletionBodyParams(
     model: String,
     prompt: String = "<|endoftext|>",
@@ -41,7 +43,7 @@ object OpenAI:
     model: String,
     input: String,
     instruction: String,
-    max_tokens: Int = 40,
+    max_tokens: Int = 100,
     temperature: Double = 0.3,
     n: Int = 1
   ) extends BodyParams

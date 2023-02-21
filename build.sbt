@@ -19,6 +19,7 @@ libraryDependencies ++= {
   val zioConfigVersion  = "3.0.7"
   val zioHttpVersion    = "0.0.4"
   val zioLoggingVersion = "2.1.8"
+  val zioOpenAIVersion  = "0.1.0"
 
   Seq(
     "com.github.nscala-time" %% "nscala-time"              % nscalaTimeVersion,
@@ -28,7 +29,9 @@ libraryDependencies ++= {
     "dev.zio"                %% "zio-config-typesafe"      % zioConfigVersion,
     "dev.zio"                %% "zio-config-magnolia"      % zioConfigVersion,
     "dev.zio"                %% "zio-http"                 % zioHttpVersion,
+    "dev.zio"                %% "zio-openai"               % zioOpenAIVersion,
     "dev.zio"                %% "zio-logging-slf4j-bridge" % zioLoggingVersion
+
     //      "io.getquill"            %% "quill-jdbc-zio"           % "4.6.0"
   )
 }

@@ -7,18 +7,24 @@ import services.OpenAIService
 import gateway.Gateway
 import zio.{ RIO, URIO, ZIO, ZLayer }
 import zio.*
-import zio.http.model.HttpError
+import zio.http.model.{ HttpError, Method }
 import zio.json.JsonEncoder
-import zio.http.{ Http, RHttpApp, Response, Server }
+import zio.http.{ Http, RHttpApp, Request, Response, Server }
 
 final case class ApiGateway(openAIService: OpenAIService)
     extends Gateway[OpenAIService, Config.OpenAIConfig with Config.ServerConfig]:
 
-  private val root: String = ???
+  private val ROOT: String = "openai"
 
-  private val apiRoute: RHttpApp[Services] = ???
+//  private val apiRoute: RHttpApp[Services] =
+//    Http.collectZIO[Request] {
+//      case Method.GET -> !! / ROOT / "completion" / prompt ⇒
+//        openAIService.createCompletionWithAda(OpenAIService.CreateCompletionWithAdaDTO(prompt))
+//      case Method.GET -> !! / ROOT / "dalle" / prompt ⇒
+//        openAIService.createImageWithAda(OpenAIService.CreateImageWithAdaDTO(prompt))
+//    }
 
-  override val startingMessage: String = ???
+  override val startingMessage: String = "Starting API Gateway..."
 
   override def start: RIO[Environment, Unit] = ???
 //    for {
